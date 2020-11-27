@@ -11,6 +11,7 @@ import tensorflow as tf
 import requests
 from PIL import Image
 
+from io import BytesIO
 # import os
 
 
@@ -31,9 +32,14 @@ def make_prediction():
 
         # 업로드 파일 처리 분기
 
-        image_url = request.value['image']
+        image_url = request.values['image']
 
-        image = Image.open(image_url).convert('RGB')
+
+
+        response = requests.get(image_url)
+        image = Image.open(BytesIO(response.content)).convert('RGB')
+
+        # image = Image.open(image_url).convert('RGB')
         image = image.resize((200, 200))
         image = np.array(image)
         image = image.reshape((200, 200, 3))
@@ -76,4 +82,4 @@ if __name__ == '__main__':
     model = tf.keras.models.load_model('./model/xception.h5')
     # model.load_weights('./model/xception.h5')
     # Flask 서비스 스타트
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='127.0.0.1', port=8000, debug=True)
